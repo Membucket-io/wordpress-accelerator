@@ -1,0 +1,92 @@
+h2 {
+  font-size: 180%;
+}
+
+.well div {
+  margin: 4px 0;
+}
+
+.amrole {
+  background: #687885;
+  border-radius: 3px;
+  color: #FFF;
+  display: inline-block;
+  font-size: 90%;
+  margin-top: 2px !important;
+  padding: 1px 4px;
+}
+
+.well .amrole {
+  margin: -1px;
+}
+
+.well .amid {
+  color: #999;
+  font-family: monospace;
+  font-size: 96%;
+}
+
+.mbdisabled {
+  color: #999;
+  font-size: 80%;
+  padding: 4px;
+}
+
+.well,
+.rolebox {
+  background: white;
+  border: 1px solid #CCC;
+  float: left;
+  margin: 5px;
+  margin-left: 0;
+  margin-top: 0;
+  min-height: 70px;
+  padding: 4px 10px;
+  width: 160px;
+}
+
+.well.selected,
+.rolebox.selected {
+  border: 2px ridge #119B4A;
+  box-shadow: 3px 3px 0 0 #BBB;
+  padding: 4px 10px;
+}
+
+.rolebox h4 {
+  margin: 0;
+}
+
+.well,
+.amrole,
+.rolebox,
+.mbdisabled {
+  cursor: default;
+}
+
+.rolebox p {
+  margin: 0;
+}
+
+.rolebox ul {
+  list-style-type: square;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.rolebox ul li {
+  margin-top: -5px;
+  margin-left: 18px;
+  padding: 0;
+}
+
+h4 {
+  margin: 0;
+}
+
+strong {
+  font-size: 120%;
+}
+
+.well strong,
+.rolebox strong {
+  font-size: 100%;
+}
