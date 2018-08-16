@@ -37,16 +37,27 @@ Please ask your hosting provider to enable Membucket for your account.";
     curl_close( $curl );
     return $result;
   }
-
+  
+  // TODO: Suitable work-around for hosts with posix_getpwuid() disabled
+  /**
+   * Reads the executing user's system name
+   * 
+   * @return string system username
+   */
   function _Get_User() {
     $user = posix_getpwuid( posix_geteuid() );
     return $user[ 'name' ];
   }
-
-  function MB_Get_User_Key() {
     global $err_OS_NOT_SUPPORTED;
     global $err_USER_NOT_AUTHORIZED;
   
+  
+  /**
+   * Reads the membucket access key required for API calls
+   * 
+   * @return string access key for this user
+   */
+  function MB_Get_User_Key() {
     // Get script directory without trailing slash
     $home = realpath( get_home_path() );
 
@@ -82,7 +93,15 @@ Please ask your hosting provider to enable Membucket for your account.";
     return $key;
   }
   
-  // List all wells our user has access to
+  /**
+   * lists all wells user has access to
+   *
+   * Calls the membucket API using the executing system user's credentials to
+   * list all Wells that can be used. Includes wells of any status, including
+   * those that have been disabled, or might be in use by other applications.
+   * 
+   * @return array|null list of {@link Well} objects
+   */
   function MB_Get_System_Wells() {
     $key  = MB_Get_User_Key();
     $user = _Get_User();
