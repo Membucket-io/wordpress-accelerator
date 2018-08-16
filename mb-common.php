@@ -84,12 +84,7 @@ Please ask your hosting provider to enable Membucket for your account.";
       // Traverse up one directory
       $home = realpath( "{$home}/../" );
     }
-
-    // Key must be set and exactly 128 characters long
-    if ( ! isset( $key ) || 128 !== strlen( $key ) ) {
-      die( $err_USER_NOT_AUTHORIZED );
-    }
-
+    
     return $key;
   }
   
