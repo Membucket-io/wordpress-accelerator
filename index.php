@@ -3,13 +3,13 @@
     Plugin Name: Accelerator by Membucket.io
     Description: A plugin that improves the performance of WordPress
     Author: Membucket.io, LLC
-    Version: 0.33
+    Version: 0.34
   */
   define( 'MB_PROD_NAME', 'Accelerator by Membucket.io' );
   define( 'MEMBUCKET', true );
   
   global $MB_version;
-  $MB_version = '0.33';
+  $MB_version = '0.34';
   
   // We need access to Membucket's API
   require( 'mb-common.php' );
@@ -18,7 +18,7 @@
   require( 'mb-install-wp.php' );
   
   function MB_menu() {
-    $product_name = __( MB_PROD_NAME, 'textdomain' );
+    $product_name = __( "Membucket", 'textdomain' );
     
     $menu_token = 'accel-membucket';
     add_menu_page(
@@ -66,13 +66,11 @@
   }
   
   function MB_analytics_page() {
-    echo '<h2>' . MB_PROD_NAME . ' Analytics</h2>';
-    echo '<p>Coming Soon!</p>';
+    require( 'page-empty.php' );
   }
   
   function MB_diagnostics_page() {
-    echo '<h2>' . MB_PROD_NAME . ' Diagnostics</h2>';
-    echo '<p>Coming Soon!</p>';
+    require( 'page-empty.php' );
   }
   
   function MB_settings_page() {
