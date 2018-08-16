@@ -20,7 +20,7 @@
     } else {
       curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
       $headers[] = 'Content-Length: ' . strlen( $data_string );
-
+      
       if ( $data ) {
         curl_setopt( $curl, CURLOPT_POSTFIELDS, $data_string );
       }
@@ -129,16 +129,16 @@
         return "Not Authorized";
       if ( 'Bad Arguments' === $well ) {
       }
-
+      
       // Skip empty or expired records
       if ( ! $well[ 'ID' ] ) continue;
-
+      
       $wells[] = new Well(
         $well[ 'ID' ],
         $well[ 'Name' ],
         $well[ 'Running' ]
       );
     }
-
+    
     return $wells;
   }

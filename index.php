@@ -13,10 +13,10 @@
   
   // We need access to Membucket's API
   require( 'mb-common.php' );
-
+  
   // Handle "Activate" or plugin update
   require( 'mb-install-wp.php' );
-
+  
   function MB_menu() {
     $product_name = __( MB_PROD_NAME, 'textdomain' );
     
@@ -29,7 +29,7 @@
       'MB_settings_page',
       plugins_url( 'membucket.svg', __FILE__ )
     );
-
+    
     add_submenu_page(
       $menu_token,
       $product_name,
@@ -38,7 +38,7 @@
       'accel-membucket',
       'MB_settings_page'
     );
-
+    
     add_submenu_page(
       $menu_token,
       $product_name,
@@ -47,7 +47,7 @@
       'accel-analytics',
       'MB_analytics_page'
     );
-
+    
     add_submenu_page(
       $menu_token,
       $product_name,
@@ -57,24 +57,24 @@
       'mb_diagnostics_page'
     );
   }
-
+  
   /**
    * Logged in Administrators should have access to our configuration screen.
    */
   if ( is_admin() ) {
     add_action( 'admin_menu', 'MB_menu' );
   }
-
+  
   function MB_analytics_page() {
     echo '<h2>' . MB_PROD_NAME . ' Analytics</h2>';
     echo '<p>Coming Soon!</p>';
   }
-
+  
   function MB_diagnostics_page() {
     echo '<h2>' . MB_PROD_NAME . ' Diagnostics</h2>';
     echo '<p>Coming Soon!</p>';
   }
-
+  
   function MB_settings_page() {
     require( 'page-settings.php' );
   }
