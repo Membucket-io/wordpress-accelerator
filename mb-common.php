@@ -6,25 +6,22 @@
   function CallAPI( $method = 'GET', $path = '', $data = false ) {
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );
-
+    
     $data_string = json_encode( $data );
+    $headers = [ 'Content-Type: application/json' ];
+    
     if ( 'GET' == $method ) {
+      curl_setopt( $curl, CURLOPT_HTTPGET, true );
+    } else {
       curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
-      curl_setopt( $curl, CURLOPT_HTTPHEADER,
-        array(
-          "Content-Type: application/json",
-          "Content-Length: " . strlen( $data_string )
-        )
-      );
+      $headers[] = 'Content-Length: ' . strlen( $data_string );
 
       if ( $data ) {
         curl_setopt( $curl, CURLOPT_POSTFIELDS, $data_string );
       }
-    } else {
-      curl_setopt( $curl, CURLOPT_HTTPHEADER, array( "Content-Type: application/json" ) );
-      curl_setopt( $curl, CURLOPT_HTTPGET, true );
     }
-
+    
+    curl_setopt( $curl, CURLOPT_HTTPHEADER,     $headers );
     curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, 3 );
     curl_setopt( $curl, CURLOPT_TIMEOUT,        10 );
     curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
