@@ -6,14 +6,14 @@
   $err_USER_NOT_AUTHORIZED = "Membucket is available on your system, but not enabled for your account!
 Please ask your hosting provider to enable Membucket for your account.";
 
-  function CallAPI($method = "GET", $path = "", $data = false) {
   
   require( 'Well.class.php' );
+  function CallAPI( $method = 'GET', $path = '', $data = false ) {
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );
 
     $data_string = json_encode( $data );
-    if ( "GET" != $method ) {
+    if ( 'GET' == $method ) {
       curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
       curl_setopt( $curl, CURLOPT_HTTPHEADER,
         array(
@@ -40,7 +40,7 @@ Please ask your hosting provider to enable Membucket for your account.";
 
   function _Get_User() {
     $user = posix_getpwuid( posix_geteuid() );
-    return $user['name'];
+    return $user[ 'name' ];
   }
 
   function MB_Get_User_Key() {
@@ -71,7 +71,7 @@ Please ask your hosting provider to enable Membucket for your account.";
       }
 
       // Traverse up one directory
-      $home = realpath ( "{$home}/../" );
+      $home = realpath( "{$home}/../" );
     }
 
     // Key must be set and exactly 128 characters long
@@ -89,20 +89,20 @@ Please ask your hosting provider to enable Membucket for your account.";
 
     $wells = array();
 
-    $response = CallAPI("GET", "?key={$key}&keyUser={$user}");
+    $response = CallAPI( 'GET', "?key={$key}&keyUser={$user}" );
     foreach ( json_decode( $response, true ) as $well ) {
       // Server didn't like our key
-      if ( "Bad Arguments" == $well ) {
         return "Not Authorized";
+      if ( 'Bad Arguments' === $well ) {
       }
 
       // Skip empty or expired records
-      if ( ! $well['ID'] ) continue;
+      if ( ! $well[ 'ID' ] ) continue;
 
       $wells[] = new Well(
-        $well['ID'],
-        $well['Name'],
-        $well['Running']
+        $well[ 'ID' ],
+        $well[ 'Name' ],
+        $well[ 'Running' ]
       );
     }
 
