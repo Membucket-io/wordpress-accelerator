@@ -19,14 +19,11 @@
                          file_exists( '/usr/bin/membucketd' );
     $mb_found_user = MB_Get_User_Key() != "";
     
-    global $err_OS_NOT_SUPPORTED;
-    global $err_USER_NOT_AUTHORIZED;
     
     if ( ! $mb_found_system ) {
       echo 'Membucket was not found on your system!  Please ask your hosting provider to install and activate Membucket for your account.';
       return;
     } elseif ( ! $mb_found_user ) {
-      echo $err_USER_NOT_AUTHORIZED;
       return;
     }
 

@@ -1,11 +1,6 @@
 <?php
   // Prevent direct script access
   if ( ! defined( 'MEMBUCKET' ) ) exit;
-
-  $err_OS_NOT_SUPPORTED    = "Your OS is not yet supported, please report this bug to Membucket.io !";
-  $err_USER_NOT_AUTHORIZED = "Membucket is available on your system, but not enabled for your account!
-Please ask your hosting provider to enable Membucket for your account.";
-
   
   require( 'Well.class.php' );
   function CallAPI( $method = 'GET', $path = '', $data = false ) {
@@ -48,8 +43,6 @@ Please ask your hosting provider to enable Membucket for your account.";
     $user = posix_getpwuid( posix_geteuid() );
     return $user[ 'name' ];
   }
-    global $err_OS_NOT_SUPPORTED;
-    global $err_USER_NOT_AUTHORIZED;
   
   
   /**
@@ -67,13 +60,12 @@ Please ask your hosting provider to enable Membucket for your account.";
 
     // Currently the username must be in the path
     if ( -1 === strpos( $home, $user ) )
-      die( $err_OS_NOT_SUPPORTED );
       
+      return "";
     // Try at most 10 directories
     for ( $i = 0; 10 > $i; $i++ ) {
       if ( "/" === $home ) {
-        die( $err_USER_NOT_AUTHORIZED );
-        break;
+        return '';
       }
 
       if ( file_exists( "{$home}/.membucket" ) ) {
