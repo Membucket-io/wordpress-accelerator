@@ -64,7 +64,7 @@
       return "";
     // Try at most 10 directories
     for ( $i = 0; 10 > $i; $i++ ) {
-      if ( "/" === $home ) {
+      if ( '/' === $home || '/home' === $home ) {
         return '';
       }
 
