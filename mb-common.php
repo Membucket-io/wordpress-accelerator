@@ -7,6 +7,8 @@
 Please ask your hosting provider to enable Membucket for your account.";
 
   function CallAPI($method = "GET", $path = "", $data = false) {
+  
+  require( 'Well.class.php' );
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );
 
@@ -80,8 +82,6 @@ Please ask your hosting provider to enable Membucket for your account.";
     return $key;
   }
   
-  require( 'Well.class.php' );
-
   // List all wells our user has access to
   function MB_Get_System_Wells() {
     $key  = MB_Get_User_Key();
