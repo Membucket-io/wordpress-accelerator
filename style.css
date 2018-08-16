@@ -2,38 +2,16 @@ h2 {
   font-size: 180%;
 }
 
-.well div {
+h4 {
+  margin: 0;
+}
+
+.mb-well div {
   margin: 4px 0;
 }
 
-.amrole {
-  background: #687885;
-  border-radius: 3px;
-  color: #FFF;
-  display: inline-block;
-  font-size: 90%;
-  margin-top: 2px !important;
-  padding: 1px 4px;
-}
-
-.well .amrole {
-  margin: -1px;
-}
-
-.well .amid {
-  color: #999;
-  font-family: monospace;
-  font-size: 96%;
-}
-
-.mbdisabled {
-  color: #999;
-  font-size: 80%;
-  padding: 4px;
-}
-
-.well,
-.rolebox {
+.mb-role,
+.mb-well {
   background: white;
   border: 1px solid #CCC;
   float: left;
@@ -45,48 +23,63 @@ h2 {
   width: 160px;
 }
 
-.well.selected,
-.rolebox.selected {
+.mb-role,
+.mb-well,
+.mb-well-role,
+#mb-note {
+  cursor: default;
+}
+
+.mb-role.selected,
+.mb-well.selected {
   border: 2px ridge #119B4A;
   box-shadow: 3px 3px 0 0 #BBB;
   padding: 4px 10px;
 }
 
-.rolebox h4 {
+.mb-well-hash {
+  color: #999;
+  font-family: monospace;
+  font-size: 96%;
+}
+
+.mb-well-role {
+  background: #687885;
+  border-radius: 3px;
+  color: #FFF;
+  display: inline-block;
+  font-size: 90%;
+  margin: -1px;
+  margin-top: 2px;
+  padding: 1px 4px;
+}
+
+.mb-role p {
   margin: 0;
 }
 
-.well,
-.amrole,
-.rolebox,
-.mbdisabled {
-  cursor: default;
-}
-
-.rolebox p {
-  margin: 0;
-}
-
-.rolebox ul {
+.mb-role ul {
   list-style-type: square;
   margin-top: 4px;
   margin-bottom: 0;
 }
-.rolebox ul li {
+.mb-role ul li {
   margin-top: -5px;
   margin-left: 18px;
   padding: 0;
-}
-
-h4 {
-  margin: 0;
 }
 
 strong {
   font-size: 120%;
 }
 
-.well strong,
-.rolebox strong {
+.mb-role strong,
+.mb-well strong {
   font-size: 100%;
+}
+
+#mb-note {
+  color: #AAA;
+  font-size: 90%;
+  padding: 4px;
 }

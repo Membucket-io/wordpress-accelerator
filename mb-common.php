@@ -35,12 +35,12 @@
     return $result;
   }
   
-  // TODO: Suitable work-around for hosts with posix_getpwuid() disabled
   /**
    * Reads the executing user's system name
    * 
    * @return string system username
    */
+  // TODO: Suitable work-around for hosts with posix_getpwuid() disabled
   function _Get_User() {
     $user = posix_getpwuid( posix_geteuid() );
     return $user[ 'name' ];
@@ -77,6 +77,61 @@
     }
     
     return '';
+  }
+
+  /**
+   * Reads well associations from {@link MB_FILENAME_ASSOCIATE}
+   *
+   * Well Associations are stored above the web directory. On cPanel we can
+   * automatically detect this fairly easily, as all sites are served from
+   * within a user's home directory. This approach might need to be adjusted
+   * when targeting another platform or control panel.
+   *
+   * @return array keyed as cache groups, values as Well hashes
+   */
+  // TODO: Check when supporting Operating Systems outside of CentOS
+  function MB_Get_Associations() {
+    // Get script directory without trailing slash
+    $path = realpath( get_home_path() );
+    $path = _RecursiveUpSearch( $path, MB_FILENAME_ASSOCIATE );
+    
+    if ( ! file_exists( $path ) ||
+         4096 < filesize( $path ) ) {
+      return null;
+    }
+    
+    $s = file_get_contents( $path );
+    $s = json_decode( $s );
+    $groups = [
+      'static'  => $s->static,
+      'dynamic' => $s->dynamic,
+      'author'  => $s->author,
+      'session' => $s->session,
+      'default' => $s->default
+    ];
+    
+    return $groups;
+  }
+  
+  function MB_Set_Associations( $well, $roles ) {
+    // Get script directory without trailing slash
+    $path = realpath( get_home_path() );
+    $path = _RecursiveUpSearch( $path, MB_FILENAME_ASSOCIATE );
+    
+    if ( '' === $path ) {
+      $path = realpath( get_home_path() ) . '/' . MB_FILENAME_ASSOCIATE;
+    }
+    
+    $assoc = MB_Get_Associations();
+    foreach ( $roles as $role ) {
+      $assoc[ $role ] = $well;
+    }
+    
+    if ( false === file_put_contents( $path, json_encode( $assoc ) ) ) {
+      return false;
+    }
+    
+    return true;
   }
   
   /**
@@ -126,8 +181,8 @@
     $response = CallAPI( 'GET', "?key={$key}&keyUser={$user}" );
     foreach ( json_decode( $response, true ) as $well ) {
       // Server didn't like our key
-        return "Not Authorized";
       if ( 'Bad Arguments' === $well ) {
+        return [ new Well( '', 'Not Authorized', false ) ];
       }
       
       // Skip empty or expired records

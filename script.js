@@ -1,107 +1,86 @@
-var selectedRoles = [];
-var selectedWell = null;
-var valid = false;
+var checkFormValidity, domForm, domFormRoles, domFormWell, domNote, domSubmit, selectedRoles, selectedWell, transformBool;
 
-// activate the form submission if valid selections
-function checkValid() {
-  if (selectedWell == null) return;
-  jQuery('#submit').prop("disabled", false);
+domForm = document.getElementById('mb-form');
+domFormRoles = document.getElementById('mb-form-roles');
+domFormWell = document.getElementById('mb-form-well');
 
-  valid = true;
-  var dis = jQuery('.mbdisabled');
-  if (dis != null && dis != undefined) dis.remove();
-}
+domNote = jQuery('#mb-note');
+domSubmit = jQuery('#mb-submit');
 
-function transformBool(selected) {
-  if (selected == undefined) {
-    // First click should select
-    selected = true;
-  } else {
-    // Otherwise, treat it like a bool
-    if (selected == "true") selected = true;
-    if (selected == "false") selected = false;
+selectedRoles = [];
+selectedWell = '';
 
-    // Invert the value
-    selected = !selected;
+checkFormValidity = function() {
+  if (selectedWell == null) {
+    domSubmit.prop('disabled', true);
+    domNote.hide();
+    return false;
   }
+  domSubmit.prop('disabled', false);
+  domNote.show();
+  return true;
+};
 
-  return selected;
-}
+transformBool = function(boolish) {
+  var selected;
+  if (boolish == null) {
+    return true;
+  }
+  if (boolish === "true") {
+    selected = true;
+  }
+  return !selected;
+};
 
-jQuery("#submit").on("click", function() {
-  checkValid();
-  if (!valid) return;
-
-  document.getElementById('fWell').value = selectedWell;
-  document.getElementById('fGroup').value = selectedRoles.join();
-  document.getElementById('fSubmit').submit();
+domSubmit.on('click', function() {
+  if (!checkFormValidity()) {
+    return false;
+  }
+  domFormRoles.value = selectedRoles.join();
+  domFormWell.value = selectedWell;
+  domForm.submit();
 });
 
-jQuery("#mbSelectAll").on("click", function () {
-  jQuery(".rolebox").each(function (i) {
-    var ele = jQuery(this);
-    var selected = transformBool(ele.attr('data-selected'));
-    if (!selected) transformBool(selected);
-
-    var id = ele.attr('id');
-    var index = selectedRoles.indexOf(id);
-    if (index == -1) {
-      selectedRoles.push(id);
-      ele.addClass("selected");
-    }
-
-    ele.attr('data-selected', selected);
-  });
-});
-
-jQuery(".rolebox").each(function (i) {
-  jQuery(this).on("click", function() {
-    var ele = jQuery(this);
-    var selected = transformBool(ele.attr('data-selected'));
-
-    // Now update visually based on the state
-    if (selected) ele.addClass("selected");
-    else ele.removeClass("selected");
-
-    // Set back the selected state
-    ele.attr('data-selected', selected);
-
-    var id = ele.attr('id');
-    if (selected) selectedRoles.push(id);
-    else {
-      var index = selectedRoles.indexOf(id);
-      if (index !== -1)
-        selectedRoles.splice(index, 1);
-    }
-  });
-});
-
-jQuery(".well").each(function (i) {
-  jQuery(this).on("click", function() {
-    // Clear all other selected states
-    var that = this;
-    jQuery(".well").each(function(i) {
-      var ele2 = jQuery(this);
-      ele2.attr('data-selected', false);
-      ele2.removeClass("selected");
-    });
-
-    var ele = jQuery(this);
-    var selected = transformBool(ele.attr('data-selected'));
-
-    // Now update visually based on the state
-    if (selected) ele.addClass("selected");
-    else ele.removeClass("selected");
-
-    // Set back the selected state
-    ele.attr('data-selected', selected);
-
-    // Keep track of the selection
+jQuery('.mb-role').each(function(_) {
+  return jQuery(this).on('click', function() {
+    var ele, i, id, selected;
+    ele = jQuery(this);
+    selected = transformBool(ele.attr('data-selected'));
     if (selected) {
-      selectedWell = ele.attr('id');
-      document.getElementById('wellName').innerHTML = selectedWell;
+      ele.addClass('selected');
+    } else {
+      ele.removeClass('selected');
     }
+    ele.attr('data-selected', selected);
+    id = ele.attr('id');
+    if (selected) {
+      return selectedRoles.push(id);
+    } else {
+      i = selectedRoles.indexOf(id);
+      if (i !== -1) {
+        return selectedRoles.splice(i, 1);
+      }
+    }
+  });
+});
 
-    checkValid();
+jQuery('.mb-well').each(function(_) {
+  jQuery(this).on('click', function() {
+    var ele;
+    ele = jQuery(this);
+    
+    // 'disable' all well elements
+    jQuery('.mb-well').each(function(_) {
+      var ele2;
+      ele2 = jQuery(this);
+      ele2.attr('data-selected', false);
+      ele2.removeClass('selected');
+    });
+    
+    // 'enable' this element
+    selectedWell = ele.attr('id');
+    ele.attr('data-selected', true);
+    ele.addClass('selected');
+    checkFormValidity();
   });
 });
