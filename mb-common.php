@@ -2,7 +2,12 @@
   // Prevent direct script access
   if ( ! defined( 'MEMBUCKET' ) ) exit;
   
+  // Some handy constants
+  define( 'MB_FILENAME_ACCESSKEY', '.membucket' );
+  define( 'MB_FILENAME_ASSOCIATE', '.membucketwells' );
+  
   require( 'Well.class.php' );
+  
   function CallAPI( $method = 'GET', $path = '', $data = false ) {
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );
@@ -41,40 +46,63 @@
     return $user[ 'name' ];
   }
   
+  /**
+   * Searches for $name, traveling up from $path
+   *
+   * Searches the directory tree starting at $path and working upwards until
+   * we hit one of the restricted directories, for a file named $name.  This
+   * search is case sensitive on all platforms.
+   *
+   * @param 
+   */
+  function _RecursiveUpSearch($path, $name) {
+    for ( $i = 0; 10 > $i; $i++ ) {
+      if ( '/'      === $path || // system root
+           '/home'  === $path || // system home directory
+           '/home2' === $path || // cpanel additional home directory
+           '/home3' === $path || // cpanel additional home directory
+           '/opt'   === $path || // system directory
+           '/usr'   === $path || // system directory
+           '/var'   === $path) { // system directory
+        return '';
+      }
+      
+      $file = "{$path}/{$name}";
+      if ( file_exists( $file ) ) {
+        return $file;
+      }
+      
+      // Traverse up one directory
+      $path = realpath( "{$path}/../" );
+    }
+    
+    return '';
+  }
   
   /**
-   * Reads the membucket access key required for API calls
+   * Reads the membucket access key from {@link MB_FILENAME_ACCESSKEY}
    * 
    * @return string access key for this user
    */
   function MB_Get_User_Key() {
     // Get script directory without trailing slash
-    $home = realpath( get_home_path() );
-
+    $path = realpath( get_home_path() );
+    
     // On CentOS under default (supported) configuration, the home Directory
     // contains the username, therefore we need the username.
     $user = _Get_User();
-
+    
     // Currently the username must be in the path
-    if ( -1 === strpos( $home, $user ) )
-      
-      return "";
+    if ( -1 === strpos( $path, $user ) )
+      return '';
+    
     // Try at most 10 directories
-    for ( $i = 0; 10 > $i; $i++ ) {
-      if ( '/' === $home || '/home' === $home ) {
-        return '';
-      }
-
-      if ( file_exists( "{$home}/.membucket" ) ) {
-        $key = trim( file_get_contents( "{$home}/.membucket" ) );
-        break;
-      }
-
-      // Traverse up one directory
-      $home = realpath( "{$home}/../" );
+    $path = _RecursiveUpSearch( $path, MB_FILENAME_ACCESSKEY );
+    if ( $path === '' ) {
+      return '';
     }
     
-    return $key;
+    return trim( file_get_contents( $path ) );
   }
   
   /**
