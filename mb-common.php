@@ -87,11 +87,14 @@
    * @return array|null list of {@link Well} objects
    */
   function MB_Get_System_Wells() {
-    $key  = MB_Get_User_Key();
     $user = _Get_User();
-
-    $wells = array();
-
+    $key  = MB_Get_User_Key();
+    
+    if ( '' === $key ) {
+      return null;
+    }
+    
+    $wells = [];
     $response = CallAPI( 'GET', "?key={$key}&keyUser={$user}" );
     foreach ( json_decode( $response, true ) as $well ) {
       // Server didn't like our key
