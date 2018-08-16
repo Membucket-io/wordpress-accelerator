@@ -19,18 +19,19 @@
 
   function MB_menu() {
     $product_name = __( MB_PROD_NAME, 'textdomain' );
-
+    
+    $menu_token = 'accel-membucket';
     add_menu_page(
       $product_name,
       $product_name,
       'manage_options',
-      'accel-membucket',
+      $menu_token,
       'MB_settings_page',
       plugins_url( 'membucket.svg', __FILE__ )
     );
 
     add_submenu_page(
-      'accel-membucket',
+      $menu_token,
       $product_name,
       'Settings',
       'manage_options',
@@ -39,7 +40,7 @@
     );
 
     add_submenu_page(
-      'accel-membucket',
+      $menu_token,
       $product_name,
       'Analytics',
       'manage_options',
@@ -48,7 +49,7 @@
     );
 
     add_submenu_page(
-      'accel-membucket',
+      $menu_token,
       $product_name,
       'Diagnostics',
       'manage_options',
