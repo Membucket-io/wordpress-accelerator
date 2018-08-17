@@ -32,6 +32,21 @@ transformBool = function(boolish) {
   return !selected;
 };
 
+jQuery('#mb-select-all').on('click', function() {
+  selectedRoles = [];
+  jQuery('.mb-role').each(function(_) {
+    var ele, selected;
+    ele = jQuery(this);
+    selected = ele.attr('data-selected');
+    if (!selected) {
+      ele.addClass('selected');
+      ele.attr('data-selected', true);
+      selectedRoles.push(ele.attr('id'));
+    }
+  });
+  checkFormValidity();
+});
+
 domSubmit.on('click', function() {
   if (!checkFormValidity()) {
     return false;
@@ -42,7 +57,7 @@ domSubmit.on('click', function() {
 });
 
 jQuery('.mb-role').each(function(_) {
-  return jQuery(this).on('click', function() {
+  jQuery(this).on('click', function() {
     var ele, i, id, selected;
     ele = jQuery(this);
     selected = transformBool(ele.attr('data-selected'));
@@ -54,13 +69,14 @@ jQuery('.mb-role').each(function(_) {
     ele.attr('data-selected', selected);
     id = ele.attr('id');
     if (selected) {
-      return selectedRoles.push(id);
+      selectedRoles.push(id);
     } else {
       i = selectedRoles.indexOf(id);
       if (i !== -1) {
-        return selectedRoles.splice(i, 1);
+        selectedRoles.splice(i, 1);
       }
     }
+    checkFormValidity();
   });
 });
 

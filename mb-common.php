@@ -8,6 +8,13 @@
   
   require( 'Well.class.php' );
   
+  $_GLOBALS[ 'mb_checks' ] = [
+    0 => file_exists( '/usr/local/cpanel/version' ),
+    1 => file_exists( '/usr/bin/membucket' ) ||
+         file_exists( '/usr/bin/membucketd' ),
+    2 => MB_Get_User_Key() != ""
+  ];
+  
   function CallAPI( $method = 'GET', $path = '', $data = false ) {
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );
@@ -91,9 +98,7 @@
    */
   // TODO: Check when supporting Operating Systems outside of CentOS
   function MB_Get_Associations() {
-    // Get script directory without trailing slash
-    $path = realpath( get_home_path() );
-    $path = _RecursiveUpSearch( $path, MB_FILENAME_ASSOCIATE );
+    $path = _RecursiveUpSearch( realpath( get_home_path() ), MB_FILENAME_ASSOCIATE );
     
     if ( ! file_exists( $path ) ||
          4096 < filesize( $path ) ) {
@@ -114,9 +119,7 @@
   }
   
   function MB_Set_Associations( $well, $roles ) {
-    // Get script directory without trailing slash
-    $path = realpath( get_home_path() );
-    $path = _RecursiveUpSearch( $path, MB_FILENAME_ASSOCIATE );
+    $path = _RecursiveUpSearch( realpath( get_home_path() ), MB_FILENAME_ASSOCIATE );
     
     if ( '' === $path ) {
       $path = realpath( get_home_path() ) . '/' . MB_FILENAME_ASSOCIATE;
@@ -140,19 +143,7 @@
    * @return string access key for this user
    */
   function MB_Get_User_Key() {
-    // Get script directory without trailing slash
-    $path = realpath( get_home_path() );
-    
-    // On CentOS under default (supported) configuration, the home Directory
-    // contains the username, therefore we need the username.
-    $user = _Get_User();
-    
-    // Currently the username must be in the path
-    if ( -1 === strpos( $path, $user ) )
-      return '';
-    
-    // Try at most 10 directories
-    $path = _RecursiveUpSearch( $path, MB_FILENAME_ACCESSKEY );
+    $path = _RecursiveUpSearch( realpath( get_home_path() ), MB_FILENAME_ACCESSKEY );
     if ( $path === '' ) {
       return '';
     }

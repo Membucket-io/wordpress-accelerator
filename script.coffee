@@ -21,6 +21,23 @@ transformBool = (boolish) ->
   selected = true if boolish == "true"
   return !selected
 
+jQuery '#mb-select-all'
+.on 'click', ->
+  selectedRoles = []
+  jQuery '.mb-role'
+  .each (_) ->
+    ele = jQuery this
+    selected = ele.attr 'data-selected'
+
+    if !selected
+      ele.addClass 'selected'
+      ele.attr 'data-selected', true
+      selectedRoles.push ele.attr 'id'
+    return
+  
+  checkFormValidity()
+  return
+
 domSubmit.on 'click', ->
   return false unless checkFormValidity()
   
@@ -49,6 +66,11 @@ jQuery '.mb-role'
     else
       i = selectedRoles.indexOf id
       selectedRoles.splice i, 1 if i != -1
+    
+    checkFormValidity()
+    return
+  
+  return
 
 jQuery '.mb-well'
 .each (_) ->

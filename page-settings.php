@@ -2,14 +2,6 @@
   // Prevent direct script access
   if ( ! defined( 'MEMBUCKET' ) ) exit;
   
-  // Checks
-  $checks = [
-    0 => file_exists( '/usr/local/cpanel/version' ),
-    1 => file_exists( '/usr/bin/membucket' ) ||
-         file_exists( '/usr/bin/membucketd' ),
-    2 => MB_Get_User_Key() != ""
-  ];
-  
   // If we're changing well associations
   if ( ! empty( $_POST ) ) {
     MB_Set_Associations( $_POST[ 'well' ], explode( ',', $_POST[ 'roles' ] ) );
@@ -31,22 +23,24 @@
 
 <h2><?php echo MB_PROD_NAME; ?> Settings</h2>
 
-<?php if ( ! $checks[ 0 ] ): ?>
+<?php if ( ! $_GLOBALS[ 'mb_checks' ][ 0 ] ): ?><p>
   Your hosting control panel is not yet supported!  If you are using cPanel/WHM
   and are seeing this message, ask your hosting provider if there is a jail in
   place.  If there is a jail, you can <a href="?dimiss=0">ignore and dismiss
   this message.</a>
-<?php endif; ?>
+</p><?php endif; ?>
 
-<?php if ( ! $checks[ 1 ] ): ?>
+<?php if ( ! $_GLOBALS[ 'mb_checks' ][ 1 ] ): ?><p>
   Membucket was not found on your system!  Your hosting provider does not
   support Membucket, or has not made it available to your user.
-<?php elseif ( ! $checks[ 2 ] ): ?>
+</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?><p>
   Your account does not have an access key for use with Membucket.  If you
   have access to SSH, please run the command: `membucket generate-key`.
   Otherwise, ask your hosting provider to run this command as your user.
-<?php endif; ?>
+</p><?php endif; ?>
 
+<?php if ( $_GLOBALS[ 'mb_checks' ][ 1 ] &&
+           $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?>
 <p>Here you can assign roles to wells and customize how membucket caches your site.</p>
 
 <div>
@@ -54,7 +48,7 @@
   <p><strong>Step 1)</strong> Select a Well</p>
 <?php
   foreach ( $wells as $well ) {
-    $groups = "Unassigned";
+    $groups = 'Unassigned';
     if ( array_key_exists( $well->ID, $roles ) ) {
       $groups = ucfirst( $roles[ $well->ID ] );
     }
@@ -79,7 +73,9 @@
 <div>
   <h3>Roles</h3>
   <p><strong>Step 2)</strong> Select Roles to assign to <span id="wellName">-</span></p>
-  <p>To accelerate everything, make sure every role is assigned to a Well. If you are unsure what to assign <button id="mbSelectAll">click here</button> to select all.</p>
+  <p>To accelerate everything, make sure every role is assigned to a Well. If
+    you are unsure what to assign, <button id="mb-select-all"
+    >click here</button> to select all.</p>
 
   <div class="mb-role" id="static">
     <h4>Static</h4>
@@ -115,3 +111,4 @@
 
 <?php wp_enqueue_script( 'jquery' ); ?>
 <script src="<?php echo plugins_url( 'script.js', __FILE__ ); ?>"></script>
+<?php endif; ?>
