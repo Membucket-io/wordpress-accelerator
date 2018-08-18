@@ -62,13 +62,11 @@
     
     $s = file_get_contents( $path );
     $s = json_decode( $s );
-    $groups = [
-      'static'  => $s->static,
-      'dynamic' => $s->dynamic,
-      'author'  => $s->author,
-      'session' => $s->session,
-      'default' => $s->default
-    ];
-    
+    $groups = [];
+    $groups[ 'static' ] = ( isset( $s->static ) ? $s->static : null );
+    $groups[ 'dynamic' ] = ( isset( $s->dynamic ) ? $s->dynamic : null );
+    $groups[ 'author' ] = ( isset( $s->author ) ? $s->author : null );
+    $groups[ 'session' ] = ( isset( $s->session ) ? $s->session : null );
+    $groups[ 'default' ] = ( isset( $s->default ) ? $s->default : null );
     return $groups;
   }

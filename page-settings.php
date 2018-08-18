@@ -9,7 +9,7 @@
       MB_Set_Associations( $_POST[ 'well' ], explode( ',', $_POST[ 'roles' ] ) );
     } else if ( isset( $_POST[ 'install' ] ) ) {
       $did_install = true;
-      MB_install();
+      activateCaching();
     }
   }
   
@@ -17,11 +17,13 @@
   $wellassoc = MB_Get_Associations();
   
   $roles = [];
-  foreach ( $wellassoc as $role => $well ) {
-    if ( array_key_exists( $well, $roles ) ) {
-      $roles[ $well ] = $roles[ $well ] . ', ' . ucfirst( $role );
-    } else {
-      $roles[ $well ] = ucfirst( $role );
+  if ( is_array ( $wellassoc ) ) {
+    foreach ( $wellassoc as $role => $well ) {
+      if ( array_key_exists( $well, $roles ) ) {
+        $roles[ $well ] = $roles[ $well ] . ', ' . ucfirst( $role );
+      } else {
+        $roles[ $well ] = ucfirst( $role );
+      }
     }
   }
 ?>
@@ -29,21 +31,62 @@
 
 <h2><?php echo MB_PROD_NAME; ?> Settings</h2>
 
-<?php if ( ! $_GLOBALS[ 'mb_checks' ][ 0 ] ): ?><p>
-  Your hosting control panel is not yet supported!  Currently Membucket only
-  supports cPanel/WHM servers.
-</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 1 ] ): ?><p>
-  Membucket was not found on your system!  Your hosting provider does not
-  support Membucket, or has not made it available to your user.
-</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 4 ] ): ?><p>
-  A required PHP module was not found enabled on this system. Please ask your
-  hosting provider to enable the PHP module called Memcache. They can do so via
-  the "Module Installers > PHP Pecl" section of WHM.
-</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?><p>
-  Your account does not have an access key for use with Membucket.  If you
-  have access to SSH, please run the command: `membucket generate-key`.
-  Otherwise, ask your hosting provider to run this command as your user.
-</p><?php else: ?>
+<?php
+  $checks_failed = 0;
+  foreach ( $_GLOBALS[ 'mb_checks' ] as $check ) {
+    if ( false === $check ) {
+      $checks_failed++;
+    }
+  }
+?>
+
+<?php if ( 1 < $checks_failed || ( 1 === $checks_failed && true === $_GLOBALS[ 'mb_checks' ][ 3 ] ) ): ?>
+  <div class="notice notice-error">
+    <?php if ( ! $_GLOBALS[ 'mb_checks' ][ 0 ] ): ?>
+      <p><strong>cPanel/WHM Not Detected!</strong></p>
+      <p>Currently, Membucket only supports cPanel/WHM control panels. We could
+        not detect that your website is being hosted under cPanel. You cannot
+        continue.</p>
+    <?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 1 ] ): ?>
+      <p><strong>Membucket Not Found</strong></p>
+      <p>Membucket was not found on your system. Your hosting provider does not
+        support Membucket, or it has not been made available to your user. Ask
+       your hosting provider how to continue.</p>
+    <?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 4 ] ): ?>
+      <p><strong>PHP Module Not Found</strong></p>
+      <p>We could not find the required PHP module "Memcache", which acts as a
+        client to Membucket. Ask your hosting provider to enable this module
+        via the "Module Installers > PHP Pecl" section of WHM.</p>
+    <?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?>
+      <p><strong>Membucket Not Activated</strong></p>
+      <p>Your account does not have an access key for use with Membucket. If
+        you have access to SSh, please run the command: "membucket generate-key".
+        Otherwise, ask your hosting provider to run this command as your user.</p>
+      <?php endif; ?>
+  </div>
+<?php endif; ?>
+
+<?php if ( 0 === $checks_failed || ( 1 === $checks_failed && false === $_GLOBALS[ 'mb_checks' ][ 3 ] ) ): ?>
+<?php if ( ! empty( $wellassoc[ 'default' ] ) ): ?>
+  <?php if ( $did_install ): ?><p>
+    <div class="notice notice-success">
+      <p><strong>Caching Active!</strong></p>
+      <p>Membucket is now active. If you load home page now, you should see
+        data on the graphs shown in cPanel under "Membucket Stats".</p>
+      <p>You can still adjust your well associations live below.</p>
+    </div>
+  <?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 3 ] ): ?>
+  <div class="notice notice-warning">
+    <p><strong>One last step...</strong></p>
+    <p>Once you are happy with your well associations:</p>
+
+    <p><form method="POST">
+      <input type="hidden" name="install" value="true"/>
+      <input type="submit" class="button button-primary" value="Activate Caching"/>
+    </form></p>
+  </div>
+  <?php endif; ?>
+<?php endif; ?>
 
 <p>Here you can assign roles to wells and customize how membucket caches your site.</p>
 
@@ -115,21 +158,4 @@
 
 <?php wp_enqueue_script( 'jquery' ); wp_enqueue_script( 'jquery-ui-core' ) ?>
 <script src="<?php echo plugins_url( 'script.js', __FILE__ ); ?>"></script>
-<?php endif; ?>
-
-<?php if ( ! empty( $wellassoc[ 'default' ] ) ): ?>
-<h3>Activate Caching</h3>
-<p><strong>Step 3)</strong> Now that you have well(s) associated...</p>
-
-<?php if ( $did_install ): ?><p>
-  We copied the file "object-cache.php" into "wp-content" for you!
-</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 3 ] ): ?><form method="POST"><p>
-  Installation of the WordPress plugin has not yet been completed!  The file
-  "object-cache.php" must be copied into the root of the "wp-content" folder.
-  <button type="submit" class="btn btn-primary">Click Here</button> to have us
-  try to do it for you. <input type="hidden" name="install" value="true"/>.
-  This should be the final step to turning cache on!
-</p></form><?php else: ?><div class="alert alert-success">
-  Caching should be active!
-</div><?php endif;?>
 <?php endif; ?>

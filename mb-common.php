@@ -13,6 +13,18 @@
     4 => class_exists( 'Memcache' )
   ];
   
+  function activateCaching() {
+    $contents = file_get_contents( __DIR__ . '/object-cache.php' );
+    $path = ABSPATH . 'wp-content/object-cache.php';
+    if ( file_exists( $path ) ) {
+      $file = file_get_contents( $path );
+      if ( $contents === $file ) {
+        return;
+      }
+    }
+    file_put_contents( $path, $contents );
+  }
+  
   function CallAPI( $method = 'GET', $path = '', $data = false ) {
     $curl = curl_init();
     curl_setopt( $curl, CURLOPT_URL, "http://127.0.0.1:9999/wells{$path}" );

@@ -125,7 +125,9 @@
     
   	function close() {
       foreach ( $this->wells as $group => $server ) {
-        $server->close();
+        if ( null !== $server ) {
+          $server->close();
+        }
       }
   	}
     
@@ -207,8 +209,11 @@
       } else if ( in_array( $group, $this->npgroups ) ) {
         $this->local_cache[ $key ] = $value = false;
       } else {
-        $value = $this->get_well( $group )->get( $key );
-        $this->cache[ $key ] = $value;
+        $server =& $this->get_well( $group );
+        if ( null !== $server ) {
+          $value = $server->get( $key );
+          $this->cache[ $key ] = $value;
+        }
       }
       
       return $value;
