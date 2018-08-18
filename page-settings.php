@@ -3,8 +3,14 @@
   if ( ! defined( 'MEMBUCKET' ) ) exit;
   
   // If we're changing well associations
+  $did_install = false;
   if ( ! empty( $_POST ) ) {
-    MB_Set_Associations( $_POST[ 'well' ], explode( ',', $_POST[ 'roles' ] ) );
+    if ( isset( $_POST[ 'well' ] ) ) {
+      MB_Set_Associations( $_POST[ 'well' ], explode( ',', $_POST[ 'roles' ] ) );
+    } else if ( isset( $_POST[ 'install' ] ) ) {
+      $did_install = true;
+      MB_install();
+    }
   }
   
   $wells = MB_Get_System_Wells();
@@ -24,23 +30,21 @@
 <h2><?php echo MB_PROD_NAME; ?> Settings</h2>
 
 <?php if ( ! $_GLOBALS[ 'mb_checks' ][ 0 ] ): ?><p>
-  Your hosting control panel is not yet supported!  If you are using cPanel/WHM
-  and are seeing this message, ask your hosting provider if there is a jail in
-  place.  If there is a jail, you can <a href="?dimiss=0">ignore and dismiss
-  this message.</a>
-</p><?php endif; ?>
-
-<?php if ( ! $_GLOBALS[ 'mb_checks' ][ 1 ] ): ?><p>
+  Your hosting control panel is not yet supported!  Currently Membucket only
+  supports cPanel/WHM servers.
+</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 1 ] ): ?><p>
   Membucket was not found on your system!  Your hosting provider does not
   support Membucket, or has not made it available to your user.
+</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 4 ] ): ?><p>
+  A required PHP module was not found enabled on this system. Please ask your
+  hosting provider to enable the PHP module called Memcache. They can do so via
+  the "Module Installers > PHP Pecl" section of WHM.
 </p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?><p>
   Your account does not have an access key for use with Membucket.  If you
   have access to SSH, please run the command: `membucket generate-key`.
   Otherwise, ask your hosting provider to run this command as your user.
-</p><?php endif; ?>
+</p><?php else: ?>
 
-<?php if ( $_GLOBALS[ 'mb_checks' ][ 1 ] &&
-           $_GLOBALS[ 'mb_checks' ][ 2 ] ): ?>
 <p>Here you can assign roles to wells and customize how membucket caches your site.</p>
 
 <div>
@@ -109,6 +113,23 @@
   <input type="hidden" id="mb-form-roles" name="roles" value="" />
 </form>
 
-<?php wp_enqueue_script( 'jquery' ); ?>
+<?php wp_enqueue_script( 'jquery' ); wp_enqueue_script( 'jquery-ui-core' ) ?>
 <script src="<?php echo plugins_url( 'script.js', __FILE__ ); ?>"></script>
+<?php endif; ?>
+
+<?php if ( ! empty( $wellassoc[ 'default' ] ) ): ?>
+<h3>Activate Caching</h3>
+<p><strong>Step 3)</strong> Now that you have well(s) associated...</p>
+
+<?php if ( $did_install ): ?><p>
+  We copied the file "object-cache.php" into "wp-content" for you!
+</p><?php elseif ( ! $_GLOBALS[ 'mb_checks' ][ 3 ] ): ?><form method="POST"><p>
+  Installation of the WordPress plugin has not yet been completed!  The file
+  "object-cache.php" must be copied into the root of the "wp-content" folder.
+  <button type="submit" class="btn btn-primary">Click Here</button> to have us
+  try to do it for you. <input type="hidden" name="install" value="true"/>.
+  This should be the final step to turning cache on!
+</p></form><?php else: ?><div class="alert alert-success">
+  Caching should be active!
+</div><?php endif;?>
 <?php endif; ?>
